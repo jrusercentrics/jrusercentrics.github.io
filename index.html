@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Cliente scenario — all embeds in modals (no helper JS)</title>
+  <title>Cliente scenario — all embeds in modals (aria-hidden)</title>
 
   <!-- Cookiebot (EXATAMENTE como o cliente / teu banner) -->
   <script id="Cookiebot"
@@ -23,12 +23,11 @@
 </head>
 
 <body>
-  <h2>Scenario cliente — todos os embeds em modais</h2>
+  <h2>Scenario cliente — todos os embeds em modais (aria-hidden)</h2>
   <p class="hint">
-    Este ficheiro é “cliente-like”: os iframes/scripts estão dentro de modais e começam como opt-out visível e opt-in escondido.
+    Versão idêntica à anterior, com a única diferença:
     <br/>
-    Não há JS a ajudar (não copio data-cookieblock-src→src, não mexo em display:none).
-    O Cookiebot é o único responsável por desbloquear e mostrar.
+    <strong>todos os modais têm <code>aria-hidden="true"</code></strong>.
   </p>
 
   <div class="grid mb-4">
@@ -39,7 +38,7 @@
   </div>
 
   <!-- ===================== YOUTUBE MODAL (marketing) ===================== -->
-  <div class="modal fade" id="exampleModal-yt" tabindex="-1">
+  <div class="modal fade" id="exampleModal-yt" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
       <div class="modal-content">
 
@@ -50,7 +49,6 @@
 
         <div class="modal-body">
 
-          <!-- versão cliente: opt-in escondido, iframe também escondido -->
           <div class="cookieconsent-optin-marketing" style="display: none;">
             <iframe
               title="youtube-player"
@@ -78,7 +76,7 @@
   </div>
 
   <!-- ===================== VIMEO MODAL (statistics) ===================== -->
-  <div class="modal fade" id="exampleModal-vimeo" tabindex="-1">
+  <div class="modal fade" id="exampleModal-vimeo" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
       <div class="modal-content">
 
@@ -89,7 +87,6 @@
 
         <div class="modal-body">
 
-          <!-- snippet cliente: iframe com src já presente mas display:none -->
           <iframe
             style="background-color: rgb(255, 255, 255); display: none;"
             title="vimeo-player"
@@ -98,7 +95,6 @@
             src="https://player.vimeo.com/video/1072636602?h=7deba18f37">
           </iframe>
 
-          <!-- placeholder equivalente -->
           <div class="cookieconsent-optout-statistics" style="display:block;">
             <div class="alert alert-primary text-center">
               Por favor <a href="javascript:Cookiebot.renew()">acepta cookies de estadísticas</a> para ver el video.
@@ -112,7 +108,7 @@
   </div>
 
   <!-- ===================== SOUNDCLOUD MODAL (statistics) ===================== -->
-  <div class="modal fade" id="exampleModal-soundcloud" tabindex="-1">
+  <div class="modal fade" id="exampleModal-soundcloud" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
       <div class="modal-content">
 
@@ -123,7 +119,6 @@
 
         <div class="modal-body">
 
-          <!-- snippet cliente -->
           <iframe
             title="Embebible:La Economía de los Millenials y su impacto en la sociedad"
             data-cookieblock-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/596141910&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
@@ -145,7 +140,7 @@
   </div>
 
   <!-- ===================== TYPEFORM MODAL (pref/stat/marketing) ===================== -->
-  <div class="modal fade" id="exampleModal-typeform" tabindex="-1">
+  <div class="modal fade" id="exampleModal-typeform" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
       <div class="modal-content">
 
@@ -156,7 +151,6 @@
 
         <div class="modal-body">
 
-          <!-- snippet cliente (estava rotulado "Hubspot", mas é Typeform embed) -->
           <div class="cookieconsent-optin-preferences cookieconsent-optin-statistics cookieconsent-optin-marketing" style="display: none;">
             <div class="typeform-widget" data-url="https://form.typeform.com/to/p7FXyhZk" style="width: 100%; height: 500px;">&nbsp;</div>
 
@@ -183,7 +177,6 @@
             </div>
           </div>
 
-          <!-- placeholder -->
           <div class="cookieconsent-optout-preferences cookieconsent-optout-statistics cookieconsent-optout-marketing" style="display:block;">
             <div class="alert alert-primary text-center">
               Por favor <a href="javascript:Cookiebot.renew()">acepta cookies (preferencias/estadísticas/marketing)</a> para ver el formulario.
