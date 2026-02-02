@@ -1,89 +1,151 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>YouTube modal test (reliable)</title>
+  <title>Cookiebot – YouTube modal test (faithful)</title>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script
+    id="Cookiebot"
+    src="https://consent.cookiebot.com/uc.js"
+    data-cbid="YOUR_CBID_HERE"
+    data-blockingmode="auto"
+    type="text/javascript">
+  </script>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+
   <style>
-    body { padding: 2rem; }
-    iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; background: #000; }
-    pre { background:#f7f7f7; padding:12px; border-radius:8px; }
+    body { padding: 2rem; font-family: system-ui, -apple-system, sans-serif; }
+    iframe { width: 100%; aspect-ratio: 16/9; border: 0; background:#000; }
+    .debug { background:#f7f7f7; padding:12px; border-radius:8px; white-space:pre-wrap; }
   </style>
 </head>
 
 <body>
-  <h3>YouTube embed test</h3>
+  <h3>Modal (abre e deve aparecer o player automaticamente)</h3>
+
   <p>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#m">
-      Open modal
-    </button>
+    <a href="#exampleModal-yt" data-bs-toggle="modal" data-bs-target="#exampleModal-yt">
+      Ver tutorial ▶
+    </a>
   </p>
 
-  <div class="modal fade" id="m" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="exampleModal-yt" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
       <div class="modal-content">
 
         <div class="modal-header">
-          <h5 class="modal-title">Video</h5>
+          <h5 class="modal-title">Tutorial</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
 
         <div class="modal-body">
-          <div class="d-flex gap-2 mb-3">
-            <button id="load" class="btn btn-success">Carregar vídeo</button>
-            <button id="unload" class="btn btn-outline-secondary">Limpar</button>
+
+          <!-- OPT-IN (marketing) -->
+          <div class="cookieconsent-optin-marketing" style="display:none;">
+            <iframe
+              id="ytframe"
+              title="YouTube modal test"
+              data-cookieblock-src="https://www.youtube.com/embed/Z7_r9g7pM7o?rel=0"
+              data-cookieconsent="marketing"
+              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              style="display:none;">
+            </iframe>
           </div>
 
-          <iframe
-            id="yt"
-            title="yt"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen>
-          </iframe>
+          <!-- OPT-OUT -->
+          <div class="cookieconsent-optout-marketing" style="display:block;">
+            <div class="alert alert-primary text-center" role="alert">
+              Por favor
+              <a href="javascript:Cookiebot.renew()">
+                acepta las cookies de marketing
+              </a>
+              para ver el video.
+            </div>
+          </div>
 
           <hr />
-          <strong>Debug</strong>
-          <pre id="dbg">loading...</pre>
-        </div>
+          <div class="debug" id="dbg">loading…</div>
 
+        </div>
       </div>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+  </script>
 
   <script>
-    const YT_SRC = "https://www.youtube.com/embed/Z7_r9g7pM7o?rel=0";
-
-    const iframe = document.getElementById("yt");
-    const dbg = document.getElementById("dbg");
-
-    function update() {
-      dbg.textContent =
-        "iframe.src = " + (iframe.getAttribute("src") || "(empty)") + "\n" +
-        "iframe.clientHeight = " + iframe.clientHeight + "\n" +
-        "modal open = " + document.body.classList.contains("modal-open");
+    function hasMarketing() {
+      try { return !!(window.Cookiebot && Cookiebot.consent && Cookiebot.consent.marketing); }
+      catch (e) { return false; }
     }
 
-    document.getElementById("load").addEventListener("click", () => {
-      iframe.setAttribute("src", YT_SRC);
-      update();
+    function ensureIframeLoaded() {
+      const optIn  = document.querySelector(".cookieconsent-optin-marketing");
+      const optOut = document.querySelector(".cookieconsent-optout-marketing");
+      const iframe = document.getElementById("ytframe");
+      const allowed = hasMarketing();
+
+      if (allowed) {
+        if (optOut) optOut.style.display = "none";
+        if (optIn)  optIn.style.display  = "block";
+
+        if (iframe) {
+          const dsrc = iframe.getAttribute("data-cookieblock-src");
+          const src  = iframe.getAttribute("src");
+          if (!src && dsrc) iframe.setAttribute("src", dsrc);
+          iframe.style.display = "block"; // IMPORTANT: no cliente isto fica visível
+        }
+      } else {
+        if (optIn)  optIn.style.display  = "none";
+        if (optOut) optOut.style.display = "block";
+        if (iframe) {
+          iframe.removeAttribute("src");
+          iframe.style.display = "none";
+        }
+      }
+      updateDebug();
+    }
+
+    function updateDebug() {
+      const iframe = document.getElementById("ytframe");
+      const src = iframe ? (iframe.getAttribute("src") || "(empty)") : "(no iframe)";
+      const cb = !!window.Cookiebot;
+      const m  = hasMarketing();
+      document.getElementById("dbg").textContent =
+        "Cookiebot present: " + cb + "\\n" +
+        "marketing consent: " + m + "\\n" +
+        "iframe src: " + src + "\\n";
+    }
+
+    // Quando Cookiebot carrega/aceita, prepara o estado (para quando o modal abrir)
+    window.addEventListener("CookiebotOnLoad", ensureIframeLoaded);
+    window.addEventListener("CookiebotOnAccept", ensureIframeLoaded);
+
+    // Quando o modal abre, garante que o iframe é carregado e visível (isto simula o cliente)
+    document.addEventListener("shown.bs.modal", (e) => {
+      if (e.target && e.target.id === "exampleModal-yt") {
+        ensureIframeLoaded();
+      }
     });
 
-    document.getElementById("unload").addEventListener("click", () => {
-      iframe.setAttribute("src", "");
-      update();
+    // (Opcional) ao fechar modal, limpa src para parar o vídeo (muitos sites fazem isso)
+    document.addEventListener("hidden.bs.modal", (e) => {
+      if (e.target && e.target.id === "exampleModal-yt") {
+        const iframe = document.getElementById("ytframe");
+        if (iframe) iframe.setAttribute("src", "");
+        updateDebug();
+      }
     });
 
-    document.getElementById("m").addEventListener("shown.bs.modal", update);
-    document.getElementById("m").addEventListener("hidden.bs.modal", () => {
-      iframe.setAttribute("src", "");
-      update();
-    });
-
-    setTimeout(update, 500);
+    setTimeout(updateDebug, 1000);
   </script>
+
 </body>
 </html>
