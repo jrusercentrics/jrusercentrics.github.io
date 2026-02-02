@@ -1,161 +1,89 @@
-<!DOCTYPE html>
-<html lang="es">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Cookiebot - YouTube modal test</title>
+  <title>YouTube modal test (reliable)</title>
 
-  <!-- Cookiebot (USA O TEU CBID) -->
-  <script
-    id="Cookiebot"
-    src="https://consent.cookiebot.com/uc.js"
-    data-cbid="YOUR_CBID_HERE"
-    data-blockingmode="auto"
-    type="text/javascript"></script>
-
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-    rel="stylesheet">
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body { padding: 3rem; }
-    .box { border: 1px solid #eee; border-radius: 12px; padding: 16px; }
-    iframe { max-width: 100%; border: 0; }
+    body { padding: 2rem; }
+    iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; background: #000; }
     pre { background:#f7f7f7; padding:12px; border-radius:8px; }
   </style>
 </head>
 
 <body>
+  <h3>YouTube embed test</h3>
+  <p>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#m">
+      Open modal
+    </button>
+  </p>
 
-  <h3>Cookiebot + YouTube (modal)</h3>
-
-  <div class="box">
-    <p><strong>Cómo registrarse a Mi Bupa</strong></p>
-    <p>
-      <a href="#exampleModal-yt" data-bs-toggle="modal" data-bs-target="#exampleModal-yt">
-        Ver tutorial ▶
-      </a>
-    </p>
-
-    <p class="text-muted mb-0">
-      Debug: se o banner Cookiebot não aparecer, o teu CBID não está configurado para este domínio.
-    </p>
-  </div>
-
-  <!-- MODAL -->
-  <div class="modal fade" id="exampleModal-yt" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="m" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
       <div class="modal-content">
 
         <div class="modal-header">
-          <h5 class="modal-title">Tutorial</h5>
+          <h5 class="modal-title">Video</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
 
         <div class="modal-body">
-
-          <!-- OPT-IN (marketing) -->
-          <div class="cookieconsent-optin-marketing" style="display:none;">
-            <iframe
-              width="900"
-              height="506"
-              class="pxc-bloque-video-iframe"
-              data-cookieblock-src="https://www.youtube.com/embed/Z7_r9g7pM7o?rel=0"
-              data-cookieconsent="marketing"
-              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen>
-            </iframe>
+          <div class="d-flex gap-2 mb-3">
+            <button id="load" class="btn btn-success">Carregar vídeo</button>
+            <button id="unload" class="btn btn-outline-secondary">Limpar</button>
           </div>
 
-          <!-- OPT-OUT -->
-          <div class="cookieconsent-optout-marketing" style="display:block;">
-            <div class="alert alert-primary text-center" role="alert">
-              Por favor
-              <a href="javascript:Cookiebot.renew()">
-                acepta las cookies de marketing
-              </a>
-              para ver el video.
-            </div>
-          </div>
+          <iframe
+            id="yt"
+            title="yt"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
 
           <hr />
-          <div>
-            <strong>Debug panel</strong>
-            <pre id="dbg">loading...</pre>
-          </div>
-
+          <strong>Debug</strong>
+          <pre id="dbg">loading...</pre>
         </div>
+
       </div>
     </div>
   </div>
 
-  <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    function hasMarketingConsent() {
-      try {
-        return !!(window.Cookiebot &&
-                  Cookiebot.consent &&
-                  Cookiebot.consent.marketing);
-      } catch (e) {
-        return false;
-      }
-    }
+    const YT_SRC = "https://www.youtube.com/embed/Z7_r9g7pM7o?rel=0";
 
-    function unlockYouTubeIfAllowed() {
-      const optIn = document.querySelector(".cookieconsent-optin-marketing");
-      const optOut = document.querySelector(".cookieconsent-optout-marketing");
-      const iframe = document.querySelector("iframe[data-cookieblock-src]");
+    const iframe = document.getElementById("yt");
+    const dbg = document.getElementById("dbg");
 
-      const allowed = hasMarketingConsent();
-
-      if (allowed) {
-        if (optOut) optOut.style.display = "none";
-        if (optIn) optIn.style.display = "block";
-
-        if (iframe) {
-          const src = iframe.getAttribute("src");
-          const dsrc = iframe.getAttribute("data-cookieblock-src");
-          if (!src && dsrc) iframe.setAttribute("src", dsrc);
-        }
-      } else {
-        if (optIn) optIn.style.display = "none";
-        if (optOut) optOut.style.display = "block";
-        if (iframe) iframe.removeAttribute("src");
-      }
-
-      updateDebug();
-    }
-
-    function updateDebug() {
-      const dbg = document.getElementById("dbg");
-      const iframe = document.querySelector("iframe[data-cookieblock-src]");
-      const src = iframe ? (iframe.getAttribute("src") || "") : "(no iframe)";
-      const cb = !!window.Cookiebot;
-      const consent = cb ? JSON.stringify(Cookiebot.consent || {}, null, 2) : "(Cookiebot missing)";
+    function update() {
       dbg.textContent =
-        "Cookiebot present: " + cb + "\n" +
-        "marketing consent: " + hasMarketingConsent() + "\n" +
-        "iframe src: " + src + "\n\n" +
-        "Cookiebot.consent:\n" + consent;
+        "iframe.src = " + (iframe.getAttribute("src") || "(empty)") + "\n" +
+        "iframe.clientHeight = " + iframe.clientHeight + "\n" +
+        "modal open = " + document.body.classList.contains("modal-open");
     }
 
-    // Quando o Cookiebot está pronto
-    window.addEventListener("CookiebotOnLoad", unlockYouTubeIfAllowed);
-    window.addEventListener("CookiebotOnAccept", unlockYouTubeIfAllowed);
-
-    // Quando abres o modal, tenta desbloquear (caso já exista consent)
-    document.addEventListener("shown.bs.modal", function (e) {
-      if (e.target && e.target.id === "exampleModal-yt") {
-        unlockYouTubeIfAllowed();
-      }
+    document.getElementById("load").addEventListener("click", () => {
+      iframe.setAttribute("src", YT_SRC);
+      update();
     });
 
-    // Inicial
-    setTimeout(updateDebug, 1000);
-  </script>
+    document.getElementById("unload").addEventListener("click", () => {
+      iframe.setAttribute("src", "");
+      update();
+    });
 
+    document.getElementById("m").addEventListener("shown.bs.modal", update);
+    document.getElementById("m").addEventListener("hidden.bs.modal", () => {
+      iframe.setAttribute("src", "");
+      update();
+    });
+
+    setTimeout(update, 500);
+  </script>
 </body>
 </html>
