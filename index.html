@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Cliente scenario — all embeds in modals (aria-hidden)</title>
+  <title>Correct Cookiebot implementation — per official docs</title>
 
-  <!-- Cookiebot (EXATAMENTE como o cliente / teu banner) -->
+  <!-- Cookiebot -->
   <script id="Cookiebot"
           src="https://consent.cookiebot.com/uc.js"
           data-cbid="e2769309-3672-42d4-bc3f-d56333e6a880"
           data-blockingmode="auto"
           type="text/javascript"></script>
 
-  <!-- Bootstrap (modal + carousel) -->
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
 
   <style>
@@ -23,169 +23,95 @@
 </head>
 
 <body>
-  <h2>Scenario cliente — todos os embeds em modais (aria-hidden)</h2>
+  <h2>Correct Cookiebot implementation — per official docs</h2>
   <p class="hint">
-    Versão idêntica à anterior, com a única diferença:
-    <br/>
-    <strong>todos os modais têm <code>aria-hidden="true"</code></strong>.
+    Todos os embeds usam exactamente a implementação recomendada pela documentação oficial:<br/>
+    <code>data-cookieblock-src</code> + <code>data-cookieconsent</code> + classes CSS opt-in/opt-out.<br/>
+    <strong>Sem modais. Sem aria-hidden. Sem display:none inline.</strong>
   </p>
 
-  <div class="grid mb-4">
-    <a class="btn btn-primary" href="#exampleModal-yt" data-bs-toggle="modal" data-bs-target="#exampleModal-yt">YouTube (marketing)</a>
-    <a class="btn btn-primary" href="#exampleModal-vimeo" data-bs-toggle="modal" data-bs-target="#exampleModal-vimeo">Vimeo (statistics)</a>
-    <a class="btn btn-primary" href="#exampleModal-soundcloud" data-bs-toggle="modal" data-bs-target="#exampleModal-soundcloud">SoundCloud (statistics)</a>
-    <a class="btn btn-primary" href="#exampleModal-typeform" data-bs-toggle="modal" data-bs-target="#exampleModal-typeform">Typeform (pref/stat/marketing)</a>
+  <!-- ===================== YOUTUBE (marketing) ===================== -->
+  <h4 class="mt-4">YouTube (marketing)</h4>
+
+  <div class="cookieconsent-optin-marketing">
+    <iframe
+      title="youtube-player"
+      width="560"
+      height="315"
+      data-cookieblock-src="https://www.youtube.com/embed/Z7_r9g7pM7o?rel=0"
+      data-cookieconsent="marketing"
+      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen>
+    </iframe>
   </div>
 
-  <!-- ===================== YOUTUBE MODAL (marketing) ===================== -->
-  <div class="modal fade" id="exampleModal-yt" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-      <div class="modal-content">
-
-        <div class="modal-header">
-          <h5 class="modal-title">YouTube (marketing)</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-
-        <div class="modal-body">
-
-          <div class="cookieconsent-optin-marketing" style="display: none;">
-            <iframe
-              title="youtube-player"
-              width="560"
-              height="450"
-              class="pxc-bloque-video-iframe cookieconsent-optin-marketing"
-              data-cookieblock-src="https://www.youtube.com/embed/Z7_r9g7pM7o?rel=0"
-              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-              data-cookieconsent="marketing"
-              allowfullscreen
-              style="display: none;">
-            </iframe>
-          </div>
-
-          <div class="cookieconsent-optout-marketing" style="display: block;">
-            <div class="alert alert-primary text-center" role="alert">
-              Por favor <a href="javascript:Cookiebot.renew()">acepta las cookies de marketing</a> para ver el video.
-            </div>
-          </div>
-
-        </div>
-
-      </div>
+  <div class="cookieconsent-optout-marketing">
+    <div class="alert alert-primary text-center" role="alert">
+      Por favor <a href="javascript:Cookiebot.renew()">acepta las cookies de marketing</a> para ver el video.
     </div>
   </div>
 
-  <!-- ===================== VIMEO MODAL (statistics) ===================== -->
-  <div class="modal fade" id="exampleModal-vimeo" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-      <div class="modal-content">
+  <!-- ===================== VIMEO (statistics) ===================== -->
+  <h4 class="mt-4">Vimeo (statistics)</h4>
 
-        <div class="modal-header">
-          <h5 class="modal-title">Vimeo (statistics)</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
+  <div class="cookieconsent-optin-statistics">
+    <iframe
+      title="vimeo-player"
+      width="560"
+      height="315"
+      data-cookieblock-src="https://player.vimeo.com/video/1072636602?h=7deba18f37"
+      data-cookieconsent="statistics">
+    </iframe>
+  </div>
 
-        <div class="modal-body">
-
-          <iframe
-            style="background-color: rgb(255, 255, 255); display: none;"
-            title="vimeo-player"
-            data-cookieconsent="statistics"
-            class="cookieconsent-optin-statistics"
-            src="https://player.vimeo.com/video/1072636602?h=7deba18f37">
-          </iframe>
-
-          <div class="cookieconsent-optout-statistics" style="display:block;">
-            <div class="alert alert-primary text-center">
-              Por favor <a href="javascript:Cookiebot.renew()">acepta cookies de estadísticas</a> para ver el video.
-            </div>
-          </div>
-
-        </div>
-
-      </div>
+  <div class="cookieconsent-optout-statistics">
+    <div class="alert alert-primary text-center" role="alert">
+      Por favor <a href="javascript:Cookiebot.renew()">acepta cookies de estadísticas</a> para ver el video.
     </div>
   </div>
 
-  <!-- ===================== SOUNDCLOUD MODAL (statistics) ===================== -->
-  <div class="modal fade" id="exampleModal-soundcloud" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-      <div class="modal-content">
+  <!-- ===================== SOUNDCLOUD (statistics) ===================== -->
+  <h4 class="mt-4">SoundCloud (statistics)</h4>
 
-        <div class="modal-header">
-          <h5 class="modal-title">SoundCloud (statistics)</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
+  <div class="cookieconsent-optin-statistics">
+    <iframe
+      title="soundcloud-player"
+      width="100%"
+      height="100"
+      data-cookieblock-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/596141910&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+      data-cookieconsent="statistics">
+    </iframe>
+  </div>
 
-        <div class="modal-body">
-
-          <iframe
-            title="Embebible:La Economía de los Millenials y su impacto en la sociedad"
-            data-cookieblock-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/596141910&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
-            class="pxc-bloque-embebible-iframe cookieconsent-optin-statistics"
-            style="width: 100%; height: 100px; display: none;"
-            data-cookieconsent="statistics">
-          </iframe>
-
-          <div class="cookieconsent-optout-statistics" style="display:block;">
-            <div class="alert alert-primary text-center">
-              Por favor <a href="javascript:Cookiebot.renew()">acepta cookies de estadísticas</a> para ver el audio.
-            </div>
-          </div>
-
-        </div>
-
-      </div>
+  <div class="cookieconsent-optout-statistics">
+    <div class="alert alert-primary text-center" role="alert">
+      Por favor <a href="javascript:Cookiebot.renew()">acepta cookies de estadísticas</a> para ver el audio.
     </div>
   </div>
 
-  <!-- ===================== TYPEFORM MODAL (pref/stat/marketing) ===================== -->
-  <div class="modal fade" id="exampleModal-typeform" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-      <div class="modal-content">
+  <!-- ===================== TYPEFORM (preferences/statistics/marketing) ===================== -->
+  <h4 class="mt-4">Typeform (preferences / statistics / marketing)</h4>
 
-        <div class="modal-header">
-          <h5 class="modal-title">Typeform (preferences/statistics/marketing)</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
+  <div class="cookieconsent-optin-preferences cookieconsent-optin-statistics cookieconsent-optin-marketing">
+    <div class="typeform-widget" data-url="https://form.typeform.com/to/p7FXyhZk" style="width: 100%; height: 500px;">&nbsp;</div>
+    <script type="text/plain" data-cookieconsent="preferences,statistics,marketing">
+      (function() {
+        var qs,js,q,s,d=document, gi=d.getElementById, ce=d.createElement, gt=d.getElementsByTagName,
+        id="typef_orm", b="https://embed.typeform.com/";
+        if(!gi.call(d,id)) {
+          js=ce.call(d,"script");
+          js.id=id;
+          js.src=b+"embed.js";
+          q=gt.call(d,"script")[0];
+          q.parentNode.insertBefore(js,q)
+        }
+      })()
+    </script>
+  </div>
 
-        <div class="modal-body">
-
-          <div class="cookieconsent-optin-preferences cookieconsent-optin-statistics cookieconsent-optin-marketing" style="display: none;">
-            <div class="typeform-widget" data-url="https://form.typeform.com/to/p7FXyhZk" style="width: 100%; height: 500px;">&nbsp;</div>
-
-            <script type="text/plain" data-cookieconsent="preferences,statistics,marketing">
-              (function() {
-                var qs,js,q,s,d=document, gi=d.getElementById, ce=d.createElement, gt=d.getElementsByTagName,
-                id="typef_orm", b="https://embed.typeform.com/";
-                if(!gi.call(d,id)) {
-                  js=ce.call(d,"script");
-                  js.id=id;
-                  js.src=b+"embed.js";
-                  q=gt.call(d,"script")[0];
-                  q.parentNode.insertBefore(js,q)
-                }
-              })()
-            </script>
-
-            <div style="font-family: Sans-Serif;font-size: 12px;color: #999;opacity: 0.5; padding-top: 5px;">
-              powered by
-              <a href="https://admin.typeform.com/signup?utm_campaign=p7FXyhZk&utm_source=typeform.com-01EKAWCKCWN37JNFVZWV3EHVY1-professional&utm_medium=typeform&utm_content=typeform-embedded-poweredbytypeform&utm_term=ES"
-                 style="color: #999" target="_blank" rel="noopener">
-                Typeform
-              </a>
-            </div>
-          </div>
-
-          <div class="cookieconsent-optout-preferences cookieconsent-optout-statistics cookieconsent-optout-marketing" style="display:block;">
-            <div class="alert alert-primary text-center">
-              Por favor <a href="javascript:Cookiebot.renew()">acepta cookies (preferencias/estadísticas/marketing)</a> para ver el formulario.
-            </div>
-          </div>
-
-        </div>
-
-      </div>
+  <div class="cookieconsent-optout-preferences cookieconsent-optout-statistics cookieconsent-optout-marketing">
+    <div class="alert alert-primary text-center" role="alert">
+      Por favor <a href="javascript:Cookiebot.renew()">acepta cookies (preferencias/estadísticas/marketing)</a> para ver el formulario.
     </div>
   </div>
 
