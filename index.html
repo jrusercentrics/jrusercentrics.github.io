@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>No blocking — all embeds load normally</title>
+  <title>UA Detection — scanner workaround</title>
 
   <!-- Cookiebot -->
   <script id="Cookiebot"
@@ -19,60 +19,130 @@
     body { padding: 2rem; font-family: system-ui, -apple-system, sans-serif; }
     .hint { color:#666; font-size: 14px; }
   </style>
+
+  <script>
+    // Detectar UA do Cookiebot scanner
+    if (/Cookiebot/i.test(navigator.userAgent)) {
+
+      // 1. Forçar visibilidade dos elementos optin via CSS
+      var style = document.createElement('style');
+      style.innerHTML = '[class*="cookieconsent-optin-"] { display: block !important; }';
+      document.head.appendChild(style);
+
+      // 2. Quando o DOM estiver pronto, trocar data-cookieblock-src por src
+      document.addEventListener('DOMContentLoaded', function () {
+
+        // Iframes: trocar data-cookieblock-src por src
+        document.querySelectorAll('iframe[data-cookieblock-src]').forEach(function(el) {
+          el.setAttribute('src', el.getAttribute('data-cookieblock-src'));
+          el.removeAttribute('data-cookieblock-src');
+        });
+
+        // Scripts: trocar type="text/plain" por type="text/javascript"
+        document.querySelectorAll('script[type="text/plain"][data-cookieconsent]').forEach(function(el) {
+          var newScript = document.createElement('script');
+          newScript.textContent = el.textContent;
+          el.parentNode.replaceChild(newScript, el);
+        });
+
+      });
+    }
+  </script>
+
 </head>
 
 <body>
-  <h2>No blocking — all embeds load normally</h2>
+  <h2>UA Detection — scanner workaround</h2>
   <p class="hint">
-    Sem qualquer bloqueio Cookiebot. Todos os embeds carregam directamente com <code>src</code> normal.<br/>
-    Versão de referência para comparar com a implementação correcta.
+    Implementação correcta per docs + detecção de UA do Cookiebot scanner.<br/>
+    Quando o scanner visita, o prior-consent blocking é ignorado e o conteúdo carrega directamente.<br/>
+    Utilizadores normais vêem o comportamento normal com consentimento.
   </p>
 
-  <!-- ===================== YOUTUBE ===================== -->
-  <h4 class="mt-4">YouTube</h4>
-  <iframe
-    title="youtube-player"
-    width="560"
-    height="315"
-    src="https://www.youtube.com/embed/Z7_r9g7pM7o?rel=0"
-    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-    allowfullscreen>
-  </iframe>
+  <!-- ===================== YOUTUBE (marketing) ===================== -->
+  <h4 class="mt-4">YouTube (marketing)</h4>
 
-  <!-- ===================== VIMEO ===================== -->
-  <h4 class="mt-4">Vimeo</h4>
-  <iframe
-    title="vimeo-player"
-    width="560"
-    height="315"
-    src="https://player.vimeo.com/video/1072636602?h=7deba18f37">
-  </iframe>
+  <div class="cookieconsent-optin-marketing">
+    <iframe
+      title="youtube-player"
+      width="560"
+      height="315"
+      data-cookieblock-src="https://www.youtube.com/embed/Z7_r9g7pM7o?rel=0"
+      data-cookieconsent="marketing"
+      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen>
+    </iframe>
+  </div>
 
-  <!-- ===================== SOUNDCLOUD ===================== -->
-  <h4 class="mt-4">SoundCloud</h4>
-  <iframe
-    title="soundcloud-player"
-    width="100%"
-    height="100"
-    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/596141910&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true">
-  </iframe>
+  <div class="cookieconsent-optout-marketing">
+    <div class="alert alert-primary text-center" role="alert">
+      Por favor <a href="javascript:Cookiebot.renew()">acepta las cookies de marketing</a> para ver el video.
+    </div>
+  </div>
 
-  <!-- ===================== TYPEFORM ===================== -->
-  <h4 class="mt-4">Typeform</h4>
-  <div class="typeform-widget" data-url="https://form.typeform.com/to/p7FXyhZk" style="width: 100%; height: 500px;">&nbsp;</div>
-  <script>
-    (function() {
-      var qs,js,q,s,d=document, gi=d.getElementById, ce=d.createElement, gt=d.getElementsByTagName,
-      id="typef_orm", b="https://embed.typeform.com/";
-      if(!gi.call(d,id)) {
-        js=ce.call(d,"script");
-        js.id=id;
-        js.src=b+"embed.js";
-        q=gt.call(d,"script")[0];
-        q.parentNode.insertBefore(js,q)
-      }
-    })()
-  </script>
+  <!-- ===================== VIMEO (statistics) ===================== -->
+  <h4 class="mt-4">Vimeo (statistics)</h4>
+
+  <div class="cookieconsent-optin-statistics">
+    <iframe
+      title="vimeo-player"
+      width="560"
+      height="315"
+      data-cookieblock-src="https://player.vimeo.com/video/1072636602?h=7deba18f37"
+      data-cookieconsent="statistics">
+    </iframe>
+  </div>
+
+  <div class="cookieconsent-optout-statistics">
+    <div class="alert alert-primary text-center" role="alert">
+      Por favor <a href="javascript:Cookiebot.renew()">acepta cookies de estadísticas</a> para ver el video.
+    </div>
+  </div>
+
+  <!-- ===================== SOUNDCLOUD (statistics) ===================== -->
+  <h4 class="mt-4">SoundCloud (statistics)</h4>
+
+  <div class="cookieconsent-optin-statistics">
+    <iframe
+      title="soundcloud-player"
+      width="100%"
+      height="100"
+      data-cookieblock-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/596141910&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+      data-cookieconsent="statistics">
+    </iframe>
+  </div>
+
+  <div class="cookieconsent-optout-statistics">
+    <div class="alert alert-primary text-center" role="alert">
+      Por favor <a href="javascript:Cookiebot.renew()">acepta cookies de estadísticas</a> para ver el audio.
+    </div>
+  </div>
+
+  <!-- ===================== TYPEFORM (preferences/statistics/marketing) ===================== -->
+  <h4 class="mt-4">Typeform (preferences / statistics / marketing)</h4>
+
+  <div class="cookieconsent-optin-preferences cookieconsent-optin-statistics cookieconsent-optin-marketing">
+    <div class="typeform-widget" data-url="https://form.typeform.com/to/p7FXyhZk" style="width: 100%; height: 500px;">&nbsp;</div>
+    <script type="text/plain" data-cookieconsent="preferences,statistics,marketing">
+      (function() {
+        var qs,js,q,s,d=document, gi=d.getElementById, ce=d.createElement, gt=d.getElementsByTagName,
+        id="typef_orm", b="https://embed.typeform.com/";
+        if(!gi.call(d,id)) {
+          js=ce.call(d,"script");
+          js.id=id;
+          js.src=b+"embed.js";
+          q=gt.call(d,"script")[0];
+          q.parentNode.insertBefore(js,q)
+        }
+      })()
+    </script>
+  </div>
+
+  <div class="cookieconsent-optout-preferences cookieconsent-optout-statistics cookieconsent-optout-marketing">
+    <div class="alert alert-primary text-center" role="alert">
+      Por favor <a href="javascript:Cookiebot.renew()">acepta cookies (preferencias/estadísticas/marketing)</a> para ver el formulario.
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
