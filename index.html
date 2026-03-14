@@ -3,9 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>UA Detection — scanner workaround</title>
+  <title>UA Detection — MutationObserver before Cookiebot</title>
 
-  <!-- Cookiebot -->
+  <script>
+    // Detectar UA do Cookiebot scanner ANTES de qualquer coisa carregar
+    if (/Cookiebot/i.test(navigator.userAgent)) {
+
+      // 1. Injectar CSS para forçar visibilidade — antes do Cookiebot injectar o seu
+      var style = document.createElement('style');
+      style.innerHTML = '[class*="cookieconsent-optin-"] { display: block !important; }';
+      document.head.appendChild(style);
+
+      // 2. Observar o DOM e fazer swap imediatamente quando cada elemento aparecer
+      var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          mutation.addedNodes.forEach(function(node) {
+            if (node.nodeType !== 1) return;
+
+            // Iframes com data-cookieblock-src
+            var iframes = node.tagName === 'IFRAME'
+              ? [node]
+              : Array.from(node.querySelectorAll('iframe[data-cookieblock-src]'));
+
+            iframes.forEach(function(el) {
+              if (el.hasAttribute('data-cookieblock-src')) {
+                el.setAttribute('src', el.getAttribute('data-cookieblock-src'));
+                el.removeAttribute('data-cookieblock-src');
+              }
+            });
+
+            // Scripts bloqueados
+            var scripts = node.tagName === 'SCRIPT'
+              ? [node]
+              : Array.from(node.querySelectorAll('script[type="text/plain"][data-cookieconsent]'));
+
+            scripts.forEach(function(el) {
+              if (el.type === 'text/plain') {
+                var newScript = document.createElement('script');
+                newScript.textContent = el.textContent;
+                el.parentNode.replaceChild(newScript, el);
+              }
+            });
+          });
+        });
+      });
+
+      observer.observe(document.documentElement, { childList: true, subtree: true });
+
+      // Parar o observer quando a página terminar de carregar
+      window.addEventListener('load', function() { observer.disconnect(); });
+    }
+  </script>
+
+  <!-- Cookiebot — carrega DEPOIS da detecção de UA -->
   <script id="Cookiebot"
           src="https://consent.cookiebot.com/uc.js"
           data-cbid="e2769309-3672-42d4-bc3f-d56333e6a880"
@@ -20,43 +70,14 @@
     .hint { color:#666; font-size: 14px; }
   </style>
 
-  <script>
-    // Detectar UA do Cookiebot scanner
-    if (/Cookiebot/i.test(navigator.userAgent)) {
-
-      // Correr depois do Cookiebot terminar de processar a página
-      window.addEventListener('CookiebotOnLoad', function () {
-
-        // 1. Forçar visibilidade dos elementos optin via CSS
-        var style = document.createElement('style');
-        style.innerHTML = '[class*="cookieconsent-optin-"] { display: block !important; }';
-        document.head.appendChild(style);
-
-        // 2. Iframes: trocar data-cookieblock-src por src
-        document.querySelectorAll('iframe[data-cookieblock-src]').forEach(function(el) {
-          el.setAttribute('src', el.getAttribute('data-cookieblock-src'));
-          el.removeAttribute('data-cookieblock-src');
-        });
-
-        // 3. Scripts: trocar type="text/plain" por type="text/javascript"
-        document.querySelectorAll('script[type="text/plain"][data-cookieconsent]').forEach(function(el) {
-          var newScript = document.createElement('script');
-          newScript.textContent = el.textContent;
-          el.parentNode.replaceChild(newScript, el);
-        });
-
-      });
-    }
-  </script>
-
 </head>
 
 <body>
-  <h2>UA Detection — scanner workaround</h2>
+  <h2>UA Detection — MutationObserver before Cookiebot</h2>
   <p class="hint">
-    Implementação correcta per docs + detecção de UA do Cookiebot scanner.<br/>
-    Quando o scanner visita, o prior-consent blocking é ignorado e o conteúdo carrega directamente.<br/>
-    Utilizadores normais vêem o comportamento normal com consentimento.
+    O MutationObserver corre antes do Cookiebot carregar.<br/>
+    Cada iframe é interceptado e o swap é feito imediatamente quando o elemento aparece no DOM.<br/>
+    O Cookiebot nunca chega a ver os <code>data-cookieblock-src</code>.
   </p>
 
   <!-- ===================== YOUTUBE (marketing) ===================== -->
