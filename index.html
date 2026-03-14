@@ -24,21 +24,21 @@
     // Detectar UA do Cookiebot scanner
     if (/Cookiebot/i.test(navigator.userAgent)) {
 
-      // 1. Forçar visibilidade dos elementos optin via CSS
-      var style = document.createElement('style');
-      style.innerHTML = '[class*="cookieconsent-optin-"] { display: block !important; }';
-      document.head.appendChild(style);
+      // Correr depois do Cookiebot terminar de processar a página
+      window.addEventListener('CookiebotOnLoad', function () {
 
-      // 2. Quando o DOM estiver pronto, trocar data-cookieblock-src por src
-      document.addEventListener('DOMContentLoaded', function () {
+        // 1. Forçar visibilidade dos elementos optin via CSS
+        var style = document.createElement('style');
+        style.innerHTML = '[class*="cookieconsent-optin-"] { display: block !important; }';
+        document.head.appendChild(style);
 
-        // Iframes: trocar data-cookieblock-src por src
+        // 2. Iframes: trocar data-cookieblock-src por src
         document.querySelectorAll('iframe[data-cookieblock-src]').forEach(function(el) {
           el.setAttribute('src', el.getAttribute('data-cookieblock-src'));
           el.removeAttribute('data-cookieblock-src');
         });
 
-        // Scripts: trocar type="text/plain" por type="text/javascript"
+        // 3. Scripts: trocar type="text/plain" por type="text/javascript"
         document.querySelectorAll('script[type="text/plain"][data-cookieconsent]').forEach(function(el) {
           var newScript = document.createElement('script');
           newScript.textContent = el.textContent;
